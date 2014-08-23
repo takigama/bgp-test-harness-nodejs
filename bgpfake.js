@@ -181,7 +181,7 @@ function printStatus() {
 	if(conns.length != 0) {
 		console.log("Connections from: ");
 		for(var t=0; t<conns.length; t++) {
-			console.log("\t"+conns[t].remoteAddress);
+			console.log("\t"+conns[t].remoteAddress+" connected to "+conns[t].localAddress);
 		}
 	} else {
 		console.log("No currently connected peers");
@@ -293,22 +293,22 @@ function toggleRandomNextHop() {
 function doPrompt() {
 	updatePrompt();
 	rl.setPrompt(currentPrompt);
-	rl.prompt();	
+	rl.prompt(true);	
 }
 
 function printCLIUsage() {
 	console.log("Help - (x) is default settings");
 	console.log("\th[elp],? - this help menu");	
-	console.log("\tu - start sending route updates to connected peers");
-	console.log("\tp - pause sending route updates to connected peers");
 	console.log("\ta - toggle use of private ranges (false)");
-	console.log("\tn a b c - change timers, a is time between publications in ms (20), b is number of updates per publication (40), c is number of routes per update (100)");
+	console.log("\tk x - automatically pause after x route publications, 0 to disable");
+	console.log("\tl - toggle per-peer updates (true). Each connected peer gets same next-hop and AS Path when this is false");
 	console.log("\tm - toggle between random next hop and my ip as next hop, randomise last octet (false)");
+	console.log("\tn a b c - change timers, a is time between publications in ms (20), b is number of updates per publication (40), c is number of routes per update (100)");
+	console.log("\tp - pause sending route updates to connected peers");
+	console.log("\tr - reset IP range back to beginning");
 	console.log("\ts - status");
 	console.log("\tt - toggles between random and sequential addressing (sequential)");
-	console.log("\tr - reset IP range back to beginning");
-	console.log("\tl - toggle per-peer updates (true). Each connected peer gets same next-hop and AS Path when this is false");
-	console.log("\tk x - automatically pause after x route publications, 0 to disable");
+	console.log("\tu - start sending route updates to connected peers");
 	console.log("\tq[uit],exit,end - Quit");
 	console.log("Prompt layout");
 	console.log("\t(AS/IP) state:connections/updates-sent (current-route)");
@@ -819,7 +819,7 @@ function parseBuffer(b, c) {
 		c.write(out);
 	} else if(type == 4) {
 		//console.log("writing keepalive - exact as sent");
-		//console.log("LOG: keepalive from remote ("+c.remoteAddress+")");
+		console.log("LOG: keepalive from remote ("+c.remoteAddress+")");
 		c.write(b);
 		readyToSend = true;
 		updateState("ready");

@@ -66,7 +66,7 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 		        q[uit],exit,end - Quit
 		Prompt layout
 		        (AS/IP) state:connections/updates-sent (current-route)
-		 
+
 		(4321/10.10.40.1) ready:1/0 (1.0.0) > u
 		LOG: Sending updates to peer
 		(4321/10.10.40.1) sending:1/0 (1.0.0) > 
@@ -97,7 +97,7 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 
 BUGS
 ====
- - When something causes output to the console, the CLI looses where the cursor was.
+ - When something causes output to the console, the CLI looses where the cursor was - FIXED
  - Multi peer support doesnt deal with a dead connection - FIXED
 
 
@@ -110,6 +110,7 @@ TODO
  - add a daemon mode where it just auto publishes based on some parameters when someone connects
  - add route withdrawal
  - add ability to fake connection problems and/or send notifies back to peers
+ - add ability to choose start range
 
  
  
