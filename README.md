@@ -33,11 +33,12 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 		Currently idle
 		Private ranges: false
 		Sequential publication: true
+		Per-Peer updates: true
 		Random NextHop: false
 		Number of connected peers: 0
 		Number of routes published: 0
 		My IP address: 10.10.40.1
-		Update timers: 20ms between publications, 40 updates per publication, 100 routes per update
+		Update timers: 50ms between publications, 3 updates per publication, 41 routes per update
 		My ASN: 4321
 		Current IP (for sequential publications): 1.0.00/24
 		AS path table size: 1048576
@@ -60,6 +61,7 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 		        s - status
 		        t - toggles between random and sequential addressing (sequential)
 		        r - reset IP range back to beginning
+		        l - toggle per-peer updates (true). Each connected peer gets same next-hop and AS Path when this is false
 		        k x - automatically pause after x route publications, 0 to disable
 		        q[uit],exit,end - Quit
 		Prompt layout
