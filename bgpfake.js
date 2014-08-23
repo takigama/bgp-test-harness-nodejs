@@ -451,7 +451,7 @@ function sendUpdate()
 						pIPb = currentIPb;
 						pIPc = currentIPc;
 
-						msg = constructUpdateMessage(routesPerUpdate, conns.localAddress);
+						msg = constructUpdateMessage(routesPerUpdate, conns[t].localAddress);
 						
 						xIPa = currentIPa;
 						xIPb = currentIPb;
