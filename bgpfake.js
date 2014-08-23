@@ -31,6 +31,8 @@ var timerCurrentlyRunning = false;
 var conns = new Array();
 var perPeerUpdates = true;
 var nextUpdateWithoutIncrement = false;
+var ipASarrayIP = new Array();
+var ipASarrayAS = new Array();
 
 // ---- vars
 
@@ -39,13 +41,40 @@ if(typeof process.argv[2] == "undefined") {
 	usage();
 }
 
+if(process.argv[2] == "-h") {
+	usage();
+}
+
+if(process.argv[2] == "--help") {
+	usage();
+}
+
+if(process.argv[2] == "help") {
+	usage();
+}
+
 function usage() {
 	console.log("Usage: "+process.argv[1]+" MyAS [[IP:AS] ....]");
 	process.exit(1);
 }
 
+//if(process.argv.length > 3) {
+//	console.log("args");
+//	console.log(process.argv);
+//}
+	
+for(var l=3; l<process.argv.length; l++) {
+	var tval = process.argv[l].split(":");
+	
+	ipASarrayIP.push(tval[0]);
+	ipASarrayAS.push(tval[1]);
+	
+}
 
-
+//console.log("as array");
+//console.log(ipASarrayIP);
+//console.log(ipASarrayAS);
+//process.exit(1);
 
 
 // ----------- startup
@@ -74,7 +103,7 @@ doPrompt();
 // --------- CLI
 
 function updatePrompt() {
-	currentPrompt = "("+myAS+) "+cState+":"+nCons+"/"+nSent+" ("+currentIPa+"."+currentIPb+"."+currentIPc+") > ";
+	currentPrompt = "("+myAS+") "+cState+":"+nCons+"/"+nSent+" ("+currentIPa+"."+currentIPb+"."+currentIPc+") > ";
 }
 
 function startCLI() {
@@ -432,40 +461,27 @@ function sendUpdate()
 		timerCurrentlyRunning = false;
 		updateState("ready");
 	} else {
-		
+		//function constructUpdateMessage(n_up, thisconn, thisAS, asPath, nextHop, ipList)
 		
 		// TODO: this code is a little ugly, it could really be re-factored
 		for(var i=0; i<updatesPerInterval; i++) {
-			if(!perPeerUpdates) var msg = constructUpdateMessage(routesPerUpdate, conns[0]);
-			for(var t=0; t<conns.length; t++) {
-				if(typeof conns[t].remoteAddress != "undefined") {
-					if(perPeerUpdates) {
-						pIPa = currentIPa;
-						pIPb = currentIPb;
-						pIPc = currentIPc;
-
-						msg = constructUpdateMessage(routesPerUpdate, conns[t]);
-						
-						xIPa = currentIPa;
-						xIPb = currentIPb;
-						xIPc = currentIPc;
-						currentIPa = pIPa;
-						currentIPb = pIPb;
-						currentIPc = pIPc;
-					}
-					conns[t].write(msg);
-				}
+			var iplist = new Array();
+			for(var l=0; l<routesPerUpdate; l++) {
+				iplist.push(getNextIP());
 			}
 			
-			if(perPeerUpdates) {
-				currentIPa = xIPa;
-				currentIPb = xIPb;
-				currentIPc = xIPc;
+			var asPath = getASPath();
+			for(var t=0; t<conns.length; t++) {
+				var thisAS = getASForIP(conns[t].localAddress);
+				var nextHop = conns[t].localAddress;
+				if(randomNextHop) nextHop = getRandomNextHop();
+				if(perPeerUpdates) asPath = getASPath();
+				msg = constructUpdateMessage(routesPerUpdate, conns[t], thisAS, asPath, nextHop, iplist);
+				conns[t].write(msg);
 			}
 		}
 		nSent += routesPerUpdate*updatesPerInterval;
-	}
-	
+	}	
 }
 
 
@@ -612,10 +628,9 @@ function getASPath() {
 	return asPaths[Math.round(asPaths.length*n)];
 }
 
-function constructUpdateMessage(n_up, thisconn) {
+function constructUpdateMessage(n_up, thisconn, thisAS, asPath, nextHop, ipList) {
 	var bsize = 0;
 
-	var aspath = getASPath();
 	//console.log("aspath is");
 	//console.log(aspath);
 	
@@ -640,7 +655,7 @@ function constructUpdateMessage(n_up, thisconn) {
 	aspathn += 3;
 
 	// as path segment size = 1 (type), + 1 (len) + as's*2
-	var aspathlen = ((aspath.length+1)*2)+1+1;
+	var aspathlen = ((asPath.length+1)*2)+1+1;
 	aspathn += aspathlen;
 	
 	// now next hop attrs = flag (1) + type (1) + len (1) + octets (4);
@@ -648,7 +663,7 @@ function constructUpdateMessage(n_up, thisconn) {
 	bsize += aspathn;
 
 	// now nlri = prefix len (1) + prefix fixed in our case (3)
-	bsize += 4*n_up;
+	bsize += 4*ipList.length;
 
 	// fudge
 	bsize+=1;
@@ -689,12 +704,12 @@ function constructUpdateMessage(n_up, thisconn) {
 	bp++;
 	buf.writeUInt8(2, bp);
 	bp++;
-	buf.writeUInt8(aspath.length+1, bp);
+	buf.writeUInt8(asPath.length+1, bp);
 	bp++;
 	//console.log("writing in my aspath: "+myas);
-	buf.writeUInt16BE(myAS, bp);
+	buf.writeUInt16BE(thisAS, bp);
 	bp+=2;
-	aspath.forEach(function (ed) {
+	asPath.forEach(function (ed) {
 		//console.log("writing in aspath: "+ed);
 		buf.writeUInt16BE(ed, bp);
 		bp+=2;
@@ -708,20 +723,11 @@ function constructUpdateMessage(n_up, thisconn) {
 	buf.writeUInt8(4, bp);
 	bp++;
 	
-	if(randomNextHop) {
-		rnh = getRandomNextHop();
-		rnh.split(".").forEach(function (ed) {
-			//console.log("writing in next hop info: " + ed);
-			buf.writeUInt8(parseInt(ed), bp);
-			bp++;
-		});
-	} else {
-		thisconn.localAddress.split(".").forEach(function (ed) {
-			//console.log("writing in next hop info: " + ed);
-			buf.writeUInt8(parseInt(ed), bp);
-			bp++;
-		});
-	}
+	nextHop.split(".").forEach(function (ed) {
+		//console.log("writing in next hop info: " + ed);
+		buf.writeUInt8(parseInt(ed), bp);
+		bp++;
+	});
 	
 //	if(randomNextHop) {
 //		nhns = Math.round(1+(Math.random()*250));
@@ -731,12 +737,10 @@ function constructUpdateMessage(n_up, thisconn) {
 //	}
 
 	// last, nlri
-	for(var nn=0; nn < n_up; nn++) {
-		//console.log("bsize: "+bsize+" bp "+bp);
+	for(var t=0; t<ipList.length; t++) { 
 		buf.writeUInt8(24, bp);
 		bp++;
-		var ip = getNextIP();
-		ip.split(".").forEach(function(ed){
+		ipList[t].split(".").forEach(function(ed){
 			//console.log("Writing in nlri: "+ed);
 			buf.writeUInt8(parseInt(ed), bp);
 			bp++;
@@ -771,6 +775,14 @@ function createaspath(i) {
 	return ret;
 }
 
+function getASForIP(ip) {
+	for(var t=0; t<ipASarrayIP.length; t++) {
+		if(ip == ipASarrayIP[t]) return ipASarrayAS[t];
+	}
+	
+	return myAS;
+}
+
 function parseBuffer(b, c) {
 	var len = b.readUInt16BE(16);
 	var type = b.readUInt8(18);
@@ -794,11 +806,12 @@ function parseBuffer(b, c) {
 		var out = new Buffer(29);
 
 
+		var thisAS = getASForIP(c.localAddress);
 		out.fill(0xff, 0, 16);
 		out.writeUInt16BE(29, 16);
 		out.writeUInt8(1, 18);
 		out.writeUInt8(4, 19);
-		out.writeUInt16BE(myAS, 20);
+		out.writeUInt16BE(thisAS, 20);
 		out.writeUInt16BE(90, 22);
 		
 		var thisIP = c.localAddress.split(".");
