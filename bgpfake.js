@@ -23,13 +23,15 @@ var currentCon = 0;
 var sequentialIPs = true;
 var usePrivateRanges = false;
 var randomNextHop = false;
-var timeBetweenUpdates = 20;
-var routesPerUpdate = 100;
-var updatesPerInterval = 40;
+var timeBetweenUpdates = 50;
+var routesPerUpdate = 41;
+var updatesPerInterval = 3;
 var autoPauseAfter = 0;
 var nextPause = 0;
 var timerCurrentlyRunning = false;
 var conns = new Array();
+var perPeerUpdates = true;
+var nextUpdateWithoutIncrement = false;
 
 // ---- vars
 
@@ -110,6 +112,9 @@ function startCLI() {
 		case "n":
 			setRouteUpdateTimers(cmd);
 			break;
+		case "l":
+			toggelPerPerrUpdates();
+			break;
 		case "k":
 			setAutoPause(cmd);
 			break;
@@ -139,7 +144,15 @@ function startCLI() {
 }
 
 
-
+function toggelPerPerrUpdates() {
+	if(perPeerUpdates) {
+		perPeerUpdates = false;
+		console.log("LOG: turning off per-peer updates (each connected peer gets same AS path and same next-hop)");
+	} else {
+		perPeerUpdates = true;
+		console.log("LOG: turning off per-peer updates (each connected peer gets differe AS path and different next-hop (if random next-hop is turned on)");		
+	}
+}
 /*
  * var timeBetweenUpdates = 20;
 var routesPerUpdate = 100;
@@ -151,6 +164,7 @@ function printStatus() {
 	console.log("Currently "+cState);
 	console.log("Private ranges: "+usePrivateRanges);
 	console.log("Sequential publication: "+sequentialIPs);
+	console.log("Per-Peer updates: "+perPeerUpdates);
 	console.log("Random NextHop: "+randomNextHop);
 	console.log("Number of connected peers: " + nCons);
 	console.log("Number of routes published: " + nSent);
@@ -187,6 +201,9 @@ function setAutoPause(cmd) {
 		nextPause = nSent+autoPauseAfter;
 		if(autoPauseAfter == 0) {
 			nextPause = 0;
+			console.log("LOG: autopause disabled");
+		} else {
+			console.log("LOG: autopause enabled. Will pause after another "+autoPauseAfter+" updates, which is "+nextPause+" more routes - note that this isnt necessarily exact as if many routes per update are sent then it'll do a complete update which may exceed this");
 		}
 	} else {
 		console.log("LOG: Usage incorrect, \"k 1000\" for example");
@@ -200,8 +217,8 @@ function setRouteUpdateTimers(cmd) {
 	
 	if(typeof timers[3] != "undefined") {
 		timeBetweenUpdates = parseInt(timers[1]);
-		routesPerUpdate = parseInt(timers[2]);
-		updatesPerInterval = parseInt(timers[3]);
+		updatesPerInterval = parseInt(timers[2]);
+		routesPerUpdate = parseInt(timers[3]);
 		
 		if(timeBetweenUpdates < 5) {
 			timeBetweenUpdates = 5;
@@ -290,6 +307,7 @@ function printCLIUsage() {
 	console.log("\ts - status");
 	console.log("\tt - toggles between random and sequential addressing (sequential)");
 	console.log("\tr - reset IP range back to beginning");
+	console.log("\tl - toggle per-peer updates (true). Each connected peer gets same next-hop and AS Path when this is false");
 	console.log("\tk x - automatically pause after x route publications, 0 to disable");
 	console.log("\tq[uit],exit,end - Quit");
 	console.log("Prompt layout");
@@ -400,6 +418,15 @@ function startUpdates() {
 
 function sendUpdate()
 {
+	var pIPa = 1;
+	var pIPb = 0;
+	var pIPc = 0;
+	var xIPa = 1;
+	var xIPb = 0;
+	var xIPc = 0;
+
+	
+	
 	if(nextPause !=0 ) {
 		if(nSent >= nextPause) {
 			updateState("stopping");
@@ -412,12 +439,38 @@ function sendUpdate()
 		timerCurrentlyRunning = false;
 		updateState("ready");
 	} else {
+		
+		
+		// TODO: this code is a little ugly, it could really be re-factored
 		for(var i=0; i<updatesPerInterval; i++) {
-			var msg = constructUpdateMessage(routesPerUpdate);
+			if(!perPeerUpdates) var msg = constructUpdateMessage(routesPerUpdate);
 			for(var t=0; t<conns.length; t++) {
-				if(typeof conns[t].remoteAddress != "undefined") conns[t].write(msg);
+				if(typeof conns[t].remoteAddress != "undefined") {
+					if(perPeerUpdates) {
+						pIPa = currentIPa;
+						pIPb = currentIPb;
+						pIPc = currentIPc;
+
+						msg = constructUpdateMessage(routesPerUpdate);
+						
+						xIPa = currentIPa;
+						xIPb = currentIPb;
+						xIPc = currentIPc;
+						currentIPa = pIPa;
+						currentIPb = pIPb;
+						currentIPc = pIPc;
+					}
+					conns[t].write(msg);
+				}
+			}
+			
+			if(perPeerUpdates) {
+				currentIPa = xIPa;
+				currentIPb = xIPb;
+				currentIPc = xIPc;
 			}
 		}
+		nSent += routesPerUpdate*updatesPerInterval;
 	}
 	
 }
@@ -662,25 +715,27 @@ function constructUpdateMessage(n_up) {
 	buf.writeUInt8(4, bp);
 	bp++;
 	
-//	if(randomNextHop) {
-//		rnh = getRandomNextHop();
-//		rnh.split(".").forEach(function (ed) {
-//			//console.log("writing in next hop info: " + ed);
-//			buf.writeUInt8(parseInt(ed), bp);
-//			bp++;
-//		});
-	myIP.split(".").forEach(function (ed) {
-		//console.log("writing in next hop info: " + ed);
-		buf.writeUInt8(parseInt(ed), bp);
-		bp++;
-	});
-	
 	if(randomNextHop) {
-		nhns = Math.round(1+(Math.random()*250));
-		bp--
-		buf.writeUInt8(nhns, bp);
-		bp++;
+		rnh = getRandomNextHop();
+		rnh.split(".").forEach(function (ed) {
+			//console.log("writing in next hop info: " + ed);
+			buf.writeUInt8(parseInt(ed), bp);
+			bp++;
+		});
+	} else {
+		myIP.split(".").forEach(function (ed) {
+			//console.log("writing in next hop info: " + ed);
+			buf.writeUInt8(parseInt(ed), bp);
+			bp++;
+		});
 	}
+	
+//	if(randomNextHop) {
+//		nhns = Math.round(1+(Math.random()*250));
+//		bp--
+//		buf.writeUInt8(nhns, bp);
+//		bp++;
+//	}
 
 	// last, nlri
 	for(var nn=0; nn < n_up; nn++) {
@@ -696,8 +751,6 @@ function constructUpdateMessage(n_up) {
 	}
 	
 	
-	nSent += n_up;
-
 	//console.log("buf is:");
 	//console.log(buf);
 	//console.log(buf.length);

@@ -37,9 +37,12 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 		Number of connected peers: 0
 		Number of routes published: 0
 		My IP address: 10.10.40.1
+		Update timers: 20ms between publications, 40 updates per publication, 100 routes per update
 		My ASN: 4321
 		Current IP (for sequential publications): 1.0.00/24
 		AS path table size: 1048576
+		Automatically pause off
+		No currently connected peers
 		(4321/10.10.40.1) connected:1/0 (1.0.0) > LOG: connection from 10.10.40.20
 		(4321/10.10.40.1) connected:1/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
 		(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: update from remote (10.10.40.20)
@@ -115,6 +118,7 @@ TODO
 DONE
 ====
  - Multiple peer support - but all see same updates and same remote AS
+ - per-peer updates (each peer gets a different AS path and if random next-hops are on, a different ip address for the next hop);
  - Add a cli
    - change next hop on the fly
    - start/stop publication
