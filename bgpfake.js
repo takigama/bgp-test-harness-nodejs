@@ -807,10 +807,13 @@ function parseBuffer(b, c) {
 		out.writeUInt8(4, 19);
 		out.writeUInt16BE(myAS, 20);
 		out.writeUInt16BE(90, 22);
-		out.writeUInt8(10, 24);
-		out.writeUInt8(99, 25);
-		out.writeUInt8(99, 26);
-		out.writeUInt8(1,27);
+		
+		var thisIP = c.localAddress.split(".");
+		out.writeUInt8(parseInt(thisIP[0]), 24);
+		out.writeUInt8(parseInt(thisIP[1]), 25);
+		out.writeUInt8(parseInt(thisIP[2]), 26);
+		out.writeUInt8(parseInt(thisIP[3]), 27);
+			
 		out.writeUInt8(0,28);
 
 		c.write(out);
