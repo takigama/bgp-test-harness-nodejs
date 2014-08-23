@@ -45,20 +45,23 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 		(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: update from remote (10.10.40.20)
 		(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
 		(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: update from remote (10.10.40.20)
-		(4321/10.10.40.1) ready:1/0 (1.0.0) > ?
-		Help
+		(4321/10.10.40.1) ready:1/0 (1.0.0) >
+		(4321/10.10.40.1) idle:0/0 (1.0.0) > ?
+		Help - (x) is default settings
 		        h[elp],? - this help menu
 		        u - start sending route updates to connected peers
 		        p - pause sending route updates to connected peers
-		        a - toggle use of private ranges
-		        m - toggle between random next hop and my ip as next hop (randomise last octet - assumes /24 on the ip address of this node)
+		        a - toggle use of private ranges (false)
+		        n a b c - change timers, a is time between publications in ms (20), b is number of updates per publication (40), c is number of routes per update (100)
+		        m - toggle between random next hop and my ip as next hop, randomise last octet (false)
 		        s - status
-		        t - toggles between random and sequential addressing
+		        t - toggles between random and sequential addressing (sequential)
 		        r - reset IP range back to beginning
+		        k x - automatically pause after x route publications, 0 to disable
 		        q[uit],exit,end - Quit
 		Prompt layout
 		        (AS/IP) state:connections/updates-sent (current-route)
-		(4321/10.10.40.1) ready:1/0 (1.0.0) > 
+		 
 		(4321/10.10.40.1) ready:1/0 (1.0.0) > u
 		LOG: Sending updates to peer
 		(4321/10.10.40.1) sending:1/0 (1.0.0) > 
@@ -87,9 +90,14 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 
 
 
+BUGS
+====
+ - When something causes output to the console, the CLI looses where the cursor was.
+ - Multi peer support doesnt deal with a dead connection
+
+
 TODO
 ====
- - Multiple peer support
  - other family support (inet6, inet-vpn, etc)
  - add support for changing the way batches of routes are published
  	- time between route publications
@@ -106,6 +114,7 @@ TODO
  
 DONE
 ====
+ - Multiple peer support - but all see same updates and same remote AS
  - Add a cli
    - change next hop on the fly
    - start/stop publication

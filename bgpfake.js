@@ -26,6 +26,10 @@ var randomNextHop = false;
 var timeBetweenUpdates = 20;
 var routesPerUpdate = 100;
 var updatesPerInterval = 40;
+var autoPauseAfter = 0;
+var nextPause = 0;
+var timerCurrentlyRunning = false;
+var conns = new Array();
 
 // ---- vars
 
@@ -86,10 +90,9 @@ function startCLI() {
 		});
 	
 	rl.on('line', function (cmd) {
-		switch(cmd) {
+		switch(cmd[0]) {
 		
 		case "?":
-		case "help":
 		case "h":
 			printCLIUsage();
 			break;
@@ -104,6 +107,12 @@ function startCLI() {
 		case "t":
 			toggleIPChoice();
 			break;
+		case "n":
+			setRouteUpdateTimers(cmd);
+			break;
+		case "k":
+			setAutoPause(cmd);
+			break;
 		case "m":
 			toggleRandomNextHop();
 			break;
@@ -117,8 +126,7 @@ function startCLI() {
 			stopUpdates();
 			break;
 		case "q":
-		case "quit":
-		case "end":
+		case "e":
 			  rl.close();
 			  process.exit(0);
 			  break;
@@ -131,6 +139,13 @@ function startCLI() {
 }
 
 
+
+/*
+ * var timeBetweenUpdates = 20;
+var routesPerUpdate = 100;
+var updatesPerInterval = 40;
+
+ */
 function printStatus() {
 	console.log("---- Status ----");
 	console.log("Currently "+cState);
@@ -140,9 +155,90 @@ function printStatus() {
 	console.log("Number of connected peers: " + nCons);
 	console.log("Number of routes published: " + nSent);
 	console.log("My IP address: " + myIP);
+	console.log("Update timers: " + timeBetweenUpdates + "ms between publications, " + updatesPerInterval + " updates per publication, " + routesPerUpdate + " routes per update");
 	console.log("My ASN: " + myAS);
 	console.log("Current IP (for sequential publications): " + currentIPa + "." + currentIPb + "." + currentIPc + "0/24");
 	console.log("AS path table size: "+asPaths.length);
+	if(autoPauseAfter == 0) {
+		console.log("Automatically pause off");
+	} else {
+		console.log("Automatically pause after "+autoPauseAfter+" route updates, next pause at "+nextPause);
+	}
+	if(conns.length != 0) {
+		console.log("Connections from: ");
+		for(var t=0; t<conns.length; t++) {
+			console.log("\t"+conns[t].remoteAddress);
+		}
+	} else {
+		console.log("No currently connected peers");
+	}
+	
+}
+
+
+function setAutoPause(cmd) {
+	var timers = cmd.split(" ");
+	if(typeof timers[1] != "undefined") {
+		autoPauseAfter = parseInt(timers[1]);
+		
+		if(autoPauseAfter < 0) {
+			console.log("LOG: autopause is either a minimum of 1 or set to 0 for diabling autopause");
+		}
+		nextPause = nSent+autoPauseAfter;
+		if(autoPauseAfter == 0) {
+			nextPause = 0;
+		}
+	} else {
+		console.log("LOG: Usage incorrect, \"k 1000\" for example");
+
+	}
+	
+}
+
+function setRouteUpdateTimers(cmd) {
+	var timers = cmd.split(" ");
+	
+	if(typeof timers[3] != "undefined") {
+		timeBetweenUpdates = parseInt(timers[1]);
+		routesPerUpdate = parseInt(timers[2]);
+		updatesPerInterval = parseInt(timers[3]);
+		
+		if(timeBetweenUpdates < 5) {
+			timeBetweenUpdates = 5;
+			console.log("LOG: time between publication must be greater then 5, setting to 5");
+		}
+		
+		if(routesPerUpdate < 1) {
+			routesPerUpdate = 1;
+			console.log("LOG: minimum of 1 route per publication, setting to 1");
+		}
+		
+		if(routesPerUpdate > 120) {
+			routesPerUpdate = 120;
+			console.log("LOG: maximum of 120 route per publication, setting to 120");
+		}
+
+		if(updatesPerInterval < 1) {
+			updatesPerInterval = 1;
+			console.log("LOG: minimum of 1 update per publication, setting to 1");
+		}
+		
+		if(updatesPerInterval > 512) {
+			updatesPerInterval = 512;
+			console.log("LOG: maximum of 512 update per publication, setting to 512");
+		}
+		
+		if(timerCurrentlyRunning) {
+			clearInterval(timerIntervalObject);
+			timerIntervalObject = setInterval(sendUpdate, timeBetweenUpdates);
+		}
+		
+	} else {
+		console.log("LOG: Usage incorrect, \"n 100 2 3\" for example");
+	}
+	
+	//console.log("LOG: timers: ");
+	//console.log(timers);
 }
 
 function togglePrivateRange() {
@@ -184,15 +280,17 @@ function doPrompt() {
 }
 
 function printCLIUsage() {
-	console.log("Help");
+	console.log("Help - (x) is default settings");
 	console.log("\th[elp],? - this help menu");	
 	console.log("\tu - start sending route updates to connected peers");
 	console.log("\tp - pause sending route updates to connected peers");
-	console.log("\ta - toggle use of private ranges");
-	console.log("\tm - toggle between random next hop and my ip as next hop (randomise last octet - assumes /24 on the ip address of this node)");
+	console.log("\ta - toggle use of private ranges (false)");
+	console.log("\tn a b c - change timers, a is time between publications in ms (20), b is number of updates per publication (40), c is number of routes per update (100)");
+	console.log("\tm - toggle between random next hop and my ip as next hop, randomise last octet (false)");
 	console.log("\ts - status");
-	console.log("\tt - toggles between random and sequential addressing");
+	console.log("\tt - toggles between random and sequential addressing (sequential)");
 	console.log("\tr - reset IP range back to beginning");
+	console.log("\tk x - automatically pause after x route publications, 0 to disable");
 	console.log("\tq[uit],exit,end - Quit");
 	console.log("Prompt layout");
 	console.log("\t(AS/IP) state:connections/updates-sent (current-route)");
@@ -265,6 +363,20 @@ function updateState(newstate) {
 
 //------------- network
 
+function reevalutateConnectionStack() {
+	// TODO: re-index the connection array
+	var newcons = Array();
+	for(var t=0; t<conns.length; t++) {
+		if(typeof conns[t].remoteAddress != "undefined") {
+			newcons.push(conns[t]);
+		}
+	}
+	
+	nCons = newcons.length;
+	
+	conns = newcons;
+}
+
 function startUpdates() {
 	if(cState == "sending") {
 		console.log("LOG: already sending...");
@@ -281,20 +393,30 @@ function startUpdates() {
 	console.log("LOG: Sending updates to peer");
 	updateState("sending");
 	timerIntervalObject = setInterval(sendUpdate, timeBetweenUpdates);
+	timerCurrentlyRunning = true;
 	//console.log("LOG: stopped sending updates");
 }
 
 
 function sendUpdate()
 {
+	if(nextPause !=0 ) {
+		if(nSent >= nextPause) {
+			updateState("stopping");
+			nextPause = nSent + autoPauseAfter;
+		}
+	}
 	if(cState != "sending") {
 		console.log("LOG: Stopping publications");
 		clearInterval(timerIntervalObject);
+		timerCurrentlyRunning = false;
 		updateState("ready");
 	} else {
 		for(var i=0; i<updatesPerInterval; i++) {
 			var msg = constructUpdateMessage(routesPerUpdate);
-			currentCon.write(msg);
+			for(var t=0; t<conns.length; t++) {
+				if(typeof conns[t].remoteAddress != "undefined") conns[t].write(msg);
+			}
 		}
 	}
 	
@@ -313,15 +435,17 @@ function stopUpdates() {
 function serverconnection(c) {
 
 	scon = c;
-
+	
 	c.on("end", function() {
 		//console.log("Server disconnected");
+		console.log("LOG: disconnection from a server");
 		nCons--;
 		if(nCons < 1) {
 			cState = "idle";
 			doPrompt();
 		}
 		currentCon = 0;
+		reevalutateConnectionStack();
 	});
 
 	c.on("data", function(buffer) {
@@ -330,6 +454,8 @@ function serverconnection(c) {
 	
 
 	currentCon = c;
+	
+	conns.push(c);
 	
 	cState = "connected";
 	nCons++;
@@ -341,6 +467,7 @@ function serverconnection(c) {
 	doPrompt();
 
 	//c.write("hello\r\n");
+	
 }
 
 
