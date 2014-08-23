@@ -278,7 +278,7 @@ function startUpdates() {
 	
 	
 	// here goes nothing
-	console.log("LOG: starting update sending");
+	console.log("LOG: Sending updates to peer");
 	updateState("sending");
 	timerIntervalObject = setInterval(sendUpdate, timeBetweenUpdates);
 	//console.log("LOG: stopped sending updates");
@@ -288,7 +288,7 @@ function startUpdates() {
 function sendUpdate()
 {
 	if(cState != "sending") {
-		console.log("oh, your killing me now?");
+		console.log("LOG: Stopping publications");
 		clearInterval(timerIntervalObject);
 		updateState("ready");
 	} else {
