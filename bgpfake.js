@@ -316,7 +316,7 @@ function printCLIUsage() {
 
 function updateState(newstate) {
 	if(cState == newstate) {
-		doPrompt();
+		//doPrompt();
 		return;
 	}
 	
