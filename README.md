@@ -108,6 +108,8 @@ TODO
  - add random communities.
  - multiple local AS/IP support (i.e. pretend to be more then one bgp peer)
  - add a daemon mode where it just auto publishes based on some parameters when someone connects
+ - add route withdrawal
+ - add ability to fake connection problems and/or send notifies back to peers
 
  
  

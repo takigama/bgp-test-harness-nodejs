@@ -171,7 +171,7 @@ function printStatus() {
 	console.log("My IP address: " + myIP);
 	console.log("Update timers: " + timeBetweenUpdates + "ms between publications, " + updatesPerInterval + " updates per publication, " + routesPerUpdate + " routes per update");
 	console.log("My ASN: " + myAS);
-	console.log("Current IP (for sequential publications): " + currentIPa + "." + currentIPb + "." + currentIPc + "0/24");
+	console.log("Current IP (for sequential publications): " + currentIPa + "." + currentIPb + "." + currentIPc + ".0/24");
 	console.log("AS path table size: "+asPaths.length);
 	if(autoPauseAfter == 0) {
 		console.log("Automatically pause off");
@@ -443,7 +443,7 @@ function sendUpdate()
 		
 		// TODO: this code is a little ugly, it could really be re-factored
 		for(var i=0; i<updatesPerInterval; i++) {
-			if(!perPeerUpdates) var msg = constructUpdateMessage(routesPerUpdate);
+			if(!perPeerUpdates) var msg = constructUpdateMessage(routesPerUpdate, myIP);
 			for(var t=0; t<conns.length; t++) {
 				if(typeof conns[t].remoteAddress != "undefined") {
 					if(perPeerUpdates) {
@@ -451,7 +451,7 @@ function sendUpdate()
 						pIPb = currentIPb;
 						pIPc = currentIPc;
 
-						msg = constructUpdateMessage(routesPerUpdate);
+						msg = constructUpdateMessage(routesPerUpdate, conns.localAddress);
 						
 						xIPa = currentIPa;
 						xIPb = currentIPb;
@@ -619,7 +619,7 @@ function getASPath() {
 	return asPaths[Math.round(asPaths.length*n)];
 }
 
-function constructUpdateMessage(n_up) {
+function constructUpdateMessage(n_up, localIP) {
 	var bsize = 0;
 
 	var aspath = getASPath();
@@ -723,7 +723,7 @@ function constructUpdateMessage(n_up) {
 			bp++;
 		});
 	} else {
-		myIP.split(".").forEach(function (ed) {
+		localIP.split(".").forEach(function (ed) {
 			//console.log("writing in next hop info: " + ed);
 			buf.writeUInt8(parseInt(ed), bp);
 			bp++;
