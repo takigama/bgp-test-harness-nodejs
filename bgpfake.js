@@ -12,7 +12,6 @@ var rl;
 var nCons = 0;
 var nSent = 0;
 var myAS;
-var myIP;
 var server;
 var cState = "starting";
 var currentIPa = 1;
@@ -40,12 +39,8 @@ if(typeof process.argv[2] == "undefined") {
 	usage();
 }
 
-if(typeof process.argv[3] == "undefined") {
-	usage();
-}
-
 function usage() {
-	console.log("Usage: "+process.argv[1]+" MyAS MyIP");
+	console.log("Usage: "+process.argv[1]+" MyAS [[IP:AS] ....]");
 	process.exit(1);
 }
 
@@ -56,7 +51,6 @@ function usage() {
 // ----------- startup
 
 myAS = process.argv[2];
-myIP = process.argv[3];
 
 
 startCLI();
@@ -80,11 +74,11 @@ doPrompt();
 // --------- CLI
 
 function updatePrompt() {
-	currentPrompt = "("+myAS+"/"+myIP+") "+cState+":"+nCons+"/"+nSent+" ("+currentIPa+"."+currentIPb+"."+currentIPc+") > ";
+	currentPrompt = "("+myAS+) "+cState+":"+nCons+"/"+nSent+" ("+currentIPa+"."+currentIPb+"."+currentIPc+") > ";
 }
 
 function startCLI() {
-	currentPrompt = "("+myAS+"/"+myIP+") starting... > ";
+	currentPrompt = "("+myAS+") starting... > ";
 
 	rl = readline.createInterface({
 		  input: process.stdin,
@@ -168,7 +162,6 @@ function printStatus() {
 	console.log("Random NextHop: "+randomNextHop);
 	console.log("Number of connected peers: " + nCons);
 	console.log("Number of routes published: " + nSent);
-	console.log("My IP address: " + myIP);
 	console.log("Update timers: " + timeBetweenUpdates + "ms between publications, " + updatesPerInterval + " updates per publication, " + routesPerUpdate + " routes per update");
 	console.log("My ASN: " + myAS);
 	console.log("Current IP (for sequential publications): " + currentIPa + "." + currentIPb + "." + currentIPc + ".0/24");
@@ -443,7 +436,7 @@ function sendUpdate()
 		
 		// TODO: this code is a little ugly, it could really be re-factored
 		for(var i=0; i<updatesPerInterval; i++) {
-			if(!perPeerUpdates) var msg = constructUpdateMessage(routesPerUpdate, myIP);
+			if(!perPeerUpdates) var msg = constructUpdateMessage(routesPerUpdate, conns[0]);
 			for(var t=0; t<conns.length; t++) {
 				if(typeof conns[t].remoteAddress != "undefined") {
 					if(perPeerUpdates) {
@@ -451,7 +444,7 @@ function sendUpdate()
 						pIPb = currentIPb;
 						pIPc = currentIPc;
 
-						msg = constructUpdateMessage(routesPerUpdate, conns[t].localAddress);
+						msg = constructUpdateMessage(routesPerUpdate, conns[t]);
 						
 						xIPa = currentIPa;
 						xIPb = currentIPb;
@@ -619,7 +612,7 @@ function getASPath() {
 	return asPaths[Math.round(asPaths.length*n)];
 }
 
-function constructUpdateMessage(n_up, localIP) {
+function constructUpdateMessage(n_up, thisconn) {
 	var bsize = 0;
 
 	var aspath = getASPath();
@@ -723,7 +716,7 @@ function constructUpdateMessage(n_up, localIP) {
 			bp++;
 		});
 	} else {
-		localIP.split(".").forEach(function (ed) {
+		thisconn.localAddress.split(".").forEach(function (ed) {
 			//console.log("writing in next hop info: " + ed);
 			buf.writeUInt8(parseInt(ed), bp);
 			bp++;
