@@ -104,13 +104,10 @@ BUGS
 TODO
 ====
  - other family support (inet6, inet-vpn, etc)
- - add support for changing the way batches of routes are published
- 	- time between route publications
- 	- number of routes pushed into each published NLRI
- 	- number of published NLRI's between publications
  - add support for different subnet lengths (currently only does /24)
  - add random communities.
  - multiple local AS/IP support (i.e. pretend to be more then one bgp peer)
+ - add a daemon mode where it just auto publishes based on some parameters when someone connects
 
  
  
@@ -121,6 +118,10 @@ DONE
 ====
  - Multiple peer support - but all see same updates and same remote AS
  - per-peer updates (each peer gets a different AS path and if random next-hops are on, a different ip address for the next hop);
+ - add support for changing the way batches of routes are published
+ 	- time between route publications
+ 	- number of routes pushed into each published NLRI
+ 	- number of published NLRI's between publications
  - Add a cli
    - change next hop on the fly
    - start/stop publication
