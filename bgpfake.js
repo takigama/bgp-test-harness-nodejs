@@ -819,7 +819,7 @@ function parseBuffer(b, c) {
 		c.write(out);
 	} else if(type == 4) {
 		//console.log("writing keepalive - exact as sent");
-		console.log("LOG: keepalive from remote ("+c.remoteAddress+")");
+		//console.log("LOG: keepalive from remote ("+c.remoteAddress+")");
 		c.write(b);
 		readyToSend = true;
 		updateState("ready");
