@@ -98,7 +98,7 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 BUGS
 ====
  - When something causes output to the console, the CLI looses where the cursor was.
- - Multi peer support doesnt deal with a dead connection
+ - Multi peer support doesnt deal with a dead connection - FIXED
 
 
 TODO
