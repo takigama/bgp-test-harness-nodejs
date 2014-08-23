@@ -203,7 +203,7 @@ function printStatus() {
 	if(conns.length != 0) {
 		console.log("Connections from: ");
 		for(var t=0; t<conns.length; t++) {
-			console.log("\t"+conns[t].remoteAddress+" connected to "+conns[t].localAddress);
+			console.log("\t"+conns[t].remoteAddress+" connected to "+conns[t].localAddress + " (local AS:"+getASForIP(conns[t].localAddress)+")");
 		}
 	} else {
 		console.log("No currently connected peers");
