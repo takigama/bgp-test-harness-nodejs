@@ -26,62 +26,62 @@ An example of it being used again a juniper route reflector, needs to bind to th
 to start with root privileges or needs the nodejs binary given low port privileges if your on linux - though
 generally sudo would be the safer option otherwise any nodejs code run by anyone can bind low ports. 
 
-nodejs-bgp-test-harness takigama$ sudo node bgpfake.js 4321 10.10.40.1
-(4321/10.10.40.1) idle:0/0 (1.0.0) > 
-(4321/10.10.40.1) idle:0/0 (1.0.0) > s
----- Status ----
-Currently idle
-Private ranges: false
-Sequential publication: true
-Random NextHop: false
-Number of connected peers: 0
-Number of routes published: 0
-My IP address: 10.10.40.1
-My ASN: 4321
-Current IP (for sequential publications): 1.0.00/24
-AS path table size: 1048576
-(4321/10.10.40.1) connected:1/0 (1.0.0) > LOG: connection from 10.10.40.20
-(4321/10.10.40.1) connected:1/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
-(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: update from remote (10.10.40.20)
-(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
-(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: update from remote (10.10.40.20)
-(4321/10.10.40.1) ready:1/0 (1.0.0) > ?
-Help
-        h[elp],? - this help menu
-        u - start sending route updates to connected peers
-        p - pause sending route updates to connected peers
-        a - toggle use of private ranges
-        m - toggle between random next hop and my ip as next hop (randomise last octet - assumes /24 on the ip address of this node)
-        s - status
-        t - toggles between random and sequential addressing
-        r - reset IP range back to beginning
-        q[uit],exit,end - Quit
-Prompt layout
-        (AS/IP) state:connections/updates-sent (current-route)
-(4321/10.10.40.1) ready:1/0 (1.0.0) > 
-(4321/10.10.40.1) ready:1/0 (1.0.0) > u
-LOG: Sending updates to peer
-(4321/10.10.40.1) sending:1/0 (1.0.0) > 
-(4321/10.10.40.1) sending:1/148000 (3.70.100) > 
-(4321/10.10.40.1) sending:1/212000 (4.66.95) > 
-(4321/10.10.40.1) sending:1/296000 (5.140.200) > 
-(4321/10.10.40.1) sending:1/384000 (6.230.225) > 
-(4321/10.10.40.1) sending:1/484000 (8.113.10) > p
-(4321/10.10.40.1) stopping:1/564000 (9.171.195) > LOG: Stopping publications
-(4321/10.10.40.1) ready:1/564000 (9.171.195) > 
-
-
-And on the route reflector:
-root> show route summary 
-Autonomous system number: 1234
-Router ID: 10.10.40.20
-
-inet.0: 564011 destinations, 564011 routes (564011 active, 0 holddown, 0 hidden)
-              Direct:      5 routes,      5 active
-               Local:      5 routes,      5 active
-                 BGP: 564000 routes, 564000 active
-              Static:      1 routes,      1 active
-
+		nodejs-bgp-test-harness takigama$ sudo node bgpfake.js 4321 10.10.40.1
+		(4321/10.10.40.1) idle:0/0 (1.0.0) > 
+		(4321/10.10.40.1) idle:0/0 (1.0.0) > s
+		---- Status ----
+		Currently idle
+		Private ranges: false
+		Sequential publication: true
+		Random NextHop: false
+		Number of connected peers: 0
+		Number of routes published: 0
+		My IP address: 10.10.40.1
+		My ASN: 4321
+		Current IP (for sequential publications): 1.0.00/24
+		AS path table size: 1048576
+		(4321/10.10.40.1) connected:1/0 (1.0.0) > LOG: connection from 10.10.40.20
+		(4321/10.10.40.1) connected:1/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
+		(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: update from remote (10.10.40.20)
+		(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
+		(4321/10.10.40.1) ready:1/0 (1.0.0) > LOG: update from remote (10.10.40.20)
+		(4321/10.10.40.1) ready:1/0 (1.0.0) > ?
+		Help
+		        h[elp],? - this help menu
+		        u - start sending route updates to connected peers
+		        p - pause sending route updates to connected peers
+		        a - toggle use of private ranges
+		        m - toggle between random next hop and my ip as next hop (randomise last octet - assumes /24 on the ip address of this node)
+		        s - status
+		        t - toggles between random and sequential addressing
+		        r - reset IP range back to beginning
+		        q[uit],exit,end - Quit
+		Prompt layout
+		        (AS/IP) state:connections/updates-sent (current-route)
+		(4321/10.10.40.1) ready:1/0 (1.0.0) > 
+		(4321/10.10.40.1) ready:1/0 (1.0.0) > u
+		LOG: Sending updates to peer
+		(4321/10.10.40.1) sending:1/0 (1.0.0) > 
+		(4321/10.10.40.1) sending:1/148000 (3.70.100) > 
+		(4321/10.10.40.1) sending:1/212000 (4.66.95) > 
+		(4321/10.10.40.1) sending:1/296000 (5.140.200) > 
+		(4321/10.10.40.1) sending:1/384000 (6.230.225) > 
+		(4321/10.10.40.1) sending:1/484000 (8.113.10) > p
+		(4321/10.10.40.1) stopping:1/564000 (9.171.195) > LOG: Stopping publications
+		(4321/10.10.40.1) ready:1/564000 (9.171.195) > 
+		
+		
+		And on the route reflector:
+		root> show route summary 
+		Autonomous system number: 1234
+		Router ID: 10.10.40.20
+		
+		inet.0: 564011 destinations, 564011 routes (564011 active, 0 holddown, 0 hidden)
+		              Direct:      5 routes,      5 active
+		               Local:      5 routes,      5 active
+		                 BGP: 564000 routes, 564000 active
+		              Static:      1 routes,      1 active
+		
 
 
 
