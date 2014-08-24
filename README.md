@@ -26,6 +26,16 @@ An example of it being used again a juniper route reflector, needs to bind to th
 to start with root privileges or needs the nodejs binary given low port privileges if your on linux - though
 generally sudo would be the safer option otherwise any nodejs code run by anyone can bind low ports. 
 
+Startup is fairly simple:
+	sudo node bgpfake.js 65555
+	
+you can also do:
+	sudo node bgpfake.js 65555 1.2.3.4:1234 2.3.4.5:2345 3.4.5.6:3456
+which tells bgpfake.js to use 65555 as the "normal" AS, but whenever it gets a
+connection on an address of 1.2.3.4 use AS 1234, use AS 2345 when connected via
+2.3.4.5 and use 3456 when connected via 3.4.5.6. For use in the case where its
+running on a machine with multiple ip addresses.
+
 
 		
 	mymachine:nodejs-bgp-test-harness takigama$ sudo node bgpfake.js 
