@@ -192,7 +192,16 @@ function printStatus() {
 	console.log("Number of connected peers: " + nCons);
 	console.log("Number of routes published: " + nSent);
 	console.log("Update timers: " + timeBetweenUpdates + "ms between publications, " + updatesPerInterval + " updates per publication, " + routesPerUpdate + " routes per update");
-	console.log("My ASN: " + myAS);
+	var extraAS = " -";
+	if(typeof ipASarrayIP[0] != "undefined") {
+		for(var l=0; l<ipASarrayIP.length; l++) {
+			extraAS += " ("+ipASarrayIP[l]+" is AS "+ipASarrayAS[l]+")";
+		}
+		console.log("My ASN: " + myAS + "" +extraAS);
+	} else {
+		console.log("My ASN: " + myAS);		
+	}
+
 	console.log("Current IP (for sequential publications): " + currentIPa + "." + currentIPb + "." + currentIPc + ".0/24");
 	console.log("AS path table size: "+asPaths.length);
 	if(autoPauseAfter == 0) {
@@ -785,8 +794,10 @@ function createaspath(i) {
 }
 
 function getASForIP(ip) {
-	for(var t=0; t<ipASarrayIP.length; t++) {
-		if(ip == ipASarrayIP[t]) return ipASarrayAS[t];
+	if(typeof ipASarrayIP[0] != "undefined") {
+		for(var t=0; t<ipASarrayIP.length; t++) {
+			if(ip == ipASarrayIP[t]) return ipASarrayAS[t];
+		}
 	}
 	
 	return myAS;
