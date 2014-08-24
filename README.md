@@ -149,6 +149,8 @@ and on the route reflector:
 
 BUGS
 ====
+ - Something I cant quite figure out is causing a random EPIPE error
+ - Lots of input validation is missing
  - When something causes output to the console, the CLI looses where the cursor was - FIXED
  - Multi peer support doesnt deal with a dead connection - FIXED
 
@@ -171,7 +173,7 @@ TODO
 DONE
 ====
  - Multiple peer support - but all see same updates and same remote AS
- - multiple local AS/IP support (i.e. pretend to be more then one bgp peer)
+ - multiple local AS/IP support (i.e. pretend to be more then one bgp peer when connected by different addresses)
  - per-peer updates (each peer gets a different AS path and if random next-hops are on, a different ip address for the next hop);
  - add support for changing the way batches of routes are published
  	- time between route publications
