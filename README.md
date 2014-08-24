@@ -40,26 +40,26 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 	(4321) connected:2/0 (1.0.0) > LOG: connection from 10.10.40.20
 	(4321) connected:2/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
 	(4321) ready:2/0 (1.0.0) > LOG: update from remote (10.10.40.20)
-	(4321) ready:2/0 (1.0.0) > sLOG: keepalive from remote (10.10.41.20)
+	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
 	(4321) ready:2/0 (1.0.0) > s
-	---- Status ----
-	Currently ready
-	Private ranges: false
-	Sequential publication: true
-	Per-Peer updates: true
-	Random NextHop: false
-	Number of connected peers: 2
-	Number of routes published: 0
-	Update timers: 50ms between publications, 3 updates per publication, 41 routes per update
-	My ASN: 4321 - (10.10.40.1 is AS 5432) (192.168.58.1 is AS 6543) (192.168.59.1 is AS 7654)
-	Current IP (for sequential publications): 1.0.0.0/24
-	AS path table size: 1048576
-	Automatically pause off
-	Connections from: 
-	        10.10.41.20 connected to 10.10.41.1 (local AS:4321)
-	        10.10.40.20 connected to 10.10.40.1 (local AS:5432)
+			---- Status ----
+			Currently ready
+			Private ranges: false
+			Sequential publication: true
+			Per-Peer updates: true
+			Random NextHop: false
+			Number of connected peers: 2
+			Number of routes published: 0
+			Update timers: 50ms between publications, 3 updates per publication, 41 routes per update
+			My ASN: 4321 - (10.10.40.1 is AS 5432) (192.168.58.1 is AS 6543) (192.168.59.1 is AS 7654)
+			Current IP (for sequential publications): 1.0.0.0/24
+			AS path table size: 1048576
+			Automatically pause off
+			Connections from: 
+			        10.10.41.20 connected to 10.10.41.1 (local AS:4321)
+			        10.10.40.20 connected to 10.10.40.1 (local AS:5432)
 	(4321) ready:2/0 (1.0.0) > ?
-	Help - (x) is default settings
+			Help - (x) is default settings
 	        h[elp],? - this help menu
 	        a - toggle use of private ranges (false)
 	        k x - automatically pause after x route publications, 0 to disable

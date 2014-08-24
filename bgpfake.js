@@ -183,36 +183,36 @@ var updatesPerInterval = 40;
 
  */
 function printStatus() {
-	console.log("---- Status ----");
-	console.log("Currently "+cState);
-	console.log("Private ranges: "+usePrivateRanges);
-	console.log("Sequential publication: "+sequentialIPs);
-	console.log("Per-Peer updates: "+perPeerUpdates);
-	console.log("Random NextHop: "+randomNextHop);
-	console.log("Number of connected peers: " + nCons);
-	console.log("Number of routes published: " + nSent);
-	console.log("Update timers: " + timeBetweenUpdates + "ms between publications, " + updatesPerInterval + " updates per publication, " + routesPerUpdate + " routes per update");
+	console.log("\t---- Status ----");
+	console.log("\tCurrently "+cState);
+	console.log("\tPrivate ranges: "+usePrivateRanges);
+	console.log("\tSequential publication: "+sequentialIPs);
+	console.log("\tPer-Peer updates: "+perPeerUpdates);
+	console.log("\tRandom NextHop: "+randomNextHop);
+	console.log("\tNumber of connected peers: " + nCons);
+	console.log("\tNumber of routes published: " + nSent);
+	console.log("\tUpdate timers: " + timeBetweenUpdates + "ms between publications, " + updatesPerInterval + " updates per publication, " + routesPerUpdate + " routes per update");
 	var extraAS = " -";
 	if(typeof ipASarrayIP[0] != "undefined") {
 		for(var l=0; l<ipASarrayIP.length; l++) {
 			extraAS += " ("+ipASarrayIP[l]+" is AS "+ipASarrayAS[l]+")";
 		}
-		console.log("My ASN: " + myAS + "" +extraAS);
+		console.log("\tMy ASN: " + myAS + "" +extraAS);
 	} else {
-		console.log("My ASN: " + myAS);		
+		console.log("\tMy ASN: " + myAS);		
 	}
 
-	console.log("Current IP (for sequential publications): " + currentIPa + "." + currentIPb + "." + currentIPc + ".0/24");
-	console.log("AS path table size: "+asPaths.length);
+	console.log("\tCurrent IP (for sequential publications): " + currentIPa + "." + currentIPb + "." + currentIPc + ".0/24");
+	console.log("\tAS path table size: "+asPaths.length);
 	if(autoPauseAfter == 0) {
-		console.log("Automatically pause off");
+		console.log("\tAutomatically pause off");
 	} else {
-		console.log("Automatically pause after "+autoPauseAfter+" route updates, next pause at "+nextPause);
+		console.log("\tAutomatically pause after "+autoPauseAfter+" route updates, next pause at "+nextPause);
 	}
 	if(conns.length != 0) {
-		console.log("Connections from: ");
+		console.log("\tConnections from: ");
 		for(var t=0; t<conns.length; t++) {
-			console.log("\t"+conns[t].remoteAddress+" connected to "+conns[t].localAddress + " (local AS:"+getASForIP(conns[t].localAddress)+")");
+			console.log("\t\t"+conns[t].remoteAddress+" connected to "+conns[t].localAddress + " (local AS:"+getASForIP(conns[t].localAddress)+")");
 		}
 	} else {
 		console.log("No currently connected peers");
@@ -328,7 +328,7 @@ function doPrompt() {
 }
 
 function printCLIUsage() {
-	console.log("Help - (x) is default settings");
+	console.log("\n\tHelp - (x) is default settings\n");
 	console.log("\th[elp],? - this help menu");	
 	console.log("\ta - toggle use of private ranges (false)");
 	console.log("\tk x - automatically pause after x route publications, 0 to disable");
