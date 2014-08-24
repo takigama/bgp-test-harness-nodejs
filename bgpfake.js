@@ -84,7 +84,7 @@ myAS = process.argv[2];
 
 startCLI();
 doPrompt();
-createAsPathArray(1048576);
+createAsPathArray(16384);
 startServer();
 cState = "idle";
 doPrompt();
