@@ -166,7 +166,10 @@ TODO
  - save settings into somewhere appropriate (perhaps, but probably not), i.e. ~/.bgpfakerc
 
  
- 
+TODO - UNLIKELY
+===============
+ - add support for importing/publishing the "real" internet routing table from ripe
+ - add support for re-publishing routes to peers when a peer publishes a route to us 
 
  
  
