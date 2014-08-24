@@ -30,39 +30,9 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 		
 	mymachine:nodejs-bgp-test-harness takigama$ sudo node bgpfake.js 
 	Usage: /Users/paulr/Documents/workspace/nodejs-bgp-test-harness/bgpfake.js MyAS [[IP:AS] ....]
-	mymachine:nodejs-bgp-test-harness takigama$ sudo node bgpfake.js 4321 10.10.40.1:5432
+	mymachine:nodejs-bgp-test-harness takigama$ sudo node bgpfake.js sudo node bgpfake.js 4321 10.10.40.1:5432 192.168.58.1:6543 192.168.59.1:7654
 	(4321) idle:0/0 (1.0.0) > 
-	(4321) idle:0/0 (1.0.0) > ?
-	Help - (x) is default settings
-	        h[elp],? - this help menu
-	        a - toggle use of private ranges (false)
-	        k x - automatically pause after x route publications, 0 to disable
-	        l - toggle per-peer updates (true). Each connected peer gets same next-hop and AS Path when this is false
-	        m - toggle between random next hop and my ip as next hop, randomise last octet (false)
-	        n a b c - change timers, a is time between publications in ms (20), b is number of updates per publication (40), c is number of routes per update (100)
-	        p - pause sending route updates to connected peers
-	        r - reset IP range back to beginning
-	        s - status
-	        t - toggles between random and sequential addressing (sequential)
-	        u - start sending route updates to connected peers
-	        q[uit],exit,end - Quit
-	Prompt layout
-	        (AS/IP) state:connections/updates-sent (current-route)
-	(4321) idle:0/0 (1.0.0) > s
-	---- Status ----
-	Currently idle
-	Private ranges: false
-	Sequential publication: true
-	Per-Peer updates: true
-	Random NextHop: false
-	Number of connected peers: 0
-	Number of routes published: 0
-	Update timers: 50ms between publications, 3 updates per publication, 41 routes per update
-	My ASN: 4321
-	Current IP (for sequential publications): 1.0.0.0/24
-	AS path table size: 1048576
-	Automatically pause off
-	No currently connected peers
+	(4321) idle:0/0 (1.0.0) > 
 	(4321) connected:1/0 (1.0.0) > LOG: connection from 10.10.41.20
 	(4321) connected:1/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
 	(4321) ready:1/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
@@ -70,6 +40,7 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 	(4321) connected:2/0 (1.0.0) > LOG: connection from 10.10.40.20
 	(4321) connected:2/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
 	(4321) ready:2/0 (1.0.0) > LOG: update from remote (10.10.40.20)
+	(4321) ready:2/0 (1.0.0) > sLOG: keepalive from remote (10.10.41.20)
 	(4321) ready:2/0 (1.0.0) > s
 	---- Status ----
 	Currently ready
@@ -80,49 +51,78 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 	Number of connected peers: 2
 	Number of routes published: 0
 	Update timers: 50ms between publications, 3 updates per publication, 41 routes per update
-	My ASN: 4321
+	My ASN: 4321 - (10.10.40.1 is AS 5432) (192.168.58.1 is AS 6543) (192.168.59.1 is AS 7654)
 	Current IP (for sequential publications): 1.0.0.0/24
 	AS path table size: 1048576
 	Automatically pause off
 	Connections from: 
-	        10.10.41.20 connected to 10.10.41.1
-	        10.10.40.20 connected to 10.10.40.1
-	(4321) ready:2/0 (1.0.0) > n 50 125 72
-	(4321) ready:2/0 (1.0.0) > k 500000
+	        10.10.41.20 connected to 10.10.41.1 (local AS:4321)
+	        10.10.40.20 connected to 10.10.40.1 (local AS:5432)
+	(4321) ready:2/0 (1.0.0) > ?
+	Help - (x) is default settings
+	        h[elp],? - this help menu
+	        a - toggle use of private ranges (false)
+	        k x - automatically pause after x route publications, 0 to disable
+	        l - toggle per-peer updates (true). Each connected peer gets same next-hop and AS Path when this is false - if random addressing, each peer gets different destinations also
+	        m - toggle between random next hop and my ip as next hop, randomise last octet (false)
+	        n a b c - change timers, a is time between publications in ms (20), b is number of updates per publication (40), c is number of routes per update (100)
+	        p - pause sending route updates to connected peers
+	        r - reset IP range back to beginning
+	        s - status
+	        t - toggles between random and sequential addressing (sequential)
+	        u - start sending route updates to connected peers
+	        q[uit],exit,end - Quit
+	Prompt layout
+	        (AS/IP) state:connections/updates-sent (current-route)
+	        (4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
 	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
-	LOG: autopause enabled. Will pause after another 50000 updates, which is 50000 more routes - note that this isnt necessarily exact as if many routes per update are sent then it'll do a complete update which may exceed this
 	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
+	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
+	(4321) ready:2/0 (1.0.0) > n 50 12 61
+	(4321) ready:2/0 (1.0.0) > k 500000
+	LOG: autopause enabled. Will pause after another 500000 updates, which is 500000 more routes - note that this isnt necessarily exact as if many routes per update are sent then it'll do a complete update which may exceed this
+	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
+	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
 	(4321) ready:2/0 (1.0.0) > u
 	LOG: Sending updates to peer
-	(4321) sending:2/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
-	(4321) sending:2/18000 (1.70.150) > 
-	(4321) sending:2/261000 (5.3.135) > 
-	(4321) stopping:2/504000 (8.191.120) > LOG: Stopping publications
+	(4321) sending:2/0 (1.0.0) > 
+	(4321) sending:2/10248 (1.40.48) > 
+	(4321) sending:2/25620 (1.100.120) > 
+	(4321) sending:2/128100 (2.247.90) > LOG: keepalive from remote (10.10.40.20)
+	(4321) sending:2/213744 (4.73.54) > LOG: keepalive from remote (10.10.41.20)
+	(4321) sending:2/363072 (6.148.207) > 
+	(4321) sending:2/434808 (7.175.33) > 
+	(4321) sending:2/447984 (7.226.204) > LOG: keepalive from remote (10.10.40.20)
+	(4321) stopping:2/500688 (8.178.123) > LOG: Stopping publications
+	(4321) ready:2/500688 (8.178.123) > LOG: keepalive from remote (10.10.41.20)
+	(4321) ready:2/500688 (8.178.123) > 
+
+
 
 
 and on the route reflector:
 
-	root> show route summary    
+	root@vrr-1> show route summary    
 	Autonomous system number: 1234
-	Router ID: 5.5.5.5
+	Router ID: 10.10.40.20
 	
-	inet.0: 504011 destinations, 1007939 routes (504011 active, 0 holddown, 0 hidden)
+	inet.0: 500699 destinations, 1001204 routes (500699 active, 0 holddown, 0 hidden)
 	              Direct:      5 routes,      5 active
 	               Local:      5 routes,      5 active
-	                 BGP: 1007928 routes, 504000 active
+	                 BGP: 1001193 routes, 500688 active
 	              Static:      1 routes,      1 active
+
+	root@vrr-1> show route 6.5.4.3 
 	
-	root> show route 6.5.4.3 
-	
-	inet.0: 504011 destinations, 1007939 routes (504011 active, 0 holddown, 0 hidden)
+	inet.0: 500699 destinations, 1001204 routes (500699 active, 0 holddown, 0 hidden)
 	+ = Active Route, - = Last Active, * = Both
 	
-	6.5.4.0/24         *[BGP/170] 00:01:44, localpref 100
-	                      AS path: 4321 24286 17548 4072 I, validation-state: unverified
-	                    > to 10.10.41.1 via em1.0
-	                    [BGP/170] 00:01:43, localpref 100
-	                      AS path: 5432 5780 10536 20048 9072 17120 I, validation-state: unverified
+	6.5.4.0/24         *[BGP/170] 00:01:56, localpref 100
+	                      AS path: 5432 18070 5116 9208 17392 3760 I, validation-state: unverified
 	                    > to 10.10.40.1 via em0.0
+	                    [BGP/170] 00:01:55, localpref 100
+	                      AS path: 4321 2450 3876 6728 12432 23840 I, validation-state: unverified
+	                    > to 10.10.41.1 via em1.0
 
 
 
