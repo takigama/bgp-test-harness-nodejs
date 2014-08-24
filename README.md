@@ -60,6 +60,7 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 			Connections from: 
 			        10.10.41.20 connected to 10.10.41.1 (local AS:4321)
 			        10.10.40.20 connected to 10.10.40.1 (local AS:5432)
+			        
 	(4321) ready:2/0 (1.0.0) > ?
 	
 			Help - (x) is default settings
@@ -78,7 +79,8 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 	        q[uit],exit,end - Quit
 	Prompt layout
 	        (AS/IP) state:connections/updates-sent (current-route)
-	        (4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
+	        
+	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
 	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
 	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.40.20)
 	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)

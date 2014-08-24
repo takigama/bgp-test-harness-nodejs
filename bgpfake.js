@@ -218,6 +218,7 @@ function printStatus() {
 		console.log("No currently connected peers");
 	}
 	
+	console.log("");	
 }
 
 
@@ -342,7 +343,7 @@ function printCLIUsage() {
 	console.log("\tu - start sending route updates to connected peers");
 	console.log("\tq[uit],exit,end - Quit");
 	console.log("Prompt layout");
-	console.log("\t(AS/IP) state:connections/updates-sent (current-route)");
+	console.log("\t(AS/IP) state:connections/updates-sent (current-route)\n");
 }
 
 function updateState(newstate) {
