@@ -2,13 +2,12 @@
 BGP Daemon in Node.js
 =====================
 
-simple implementation of the bgp protocol stack - set your ip address and your AS and it'll publish a
+simple implementation of the bgp protocol stack - set your AS (and even your peer-ip address AS) and it'll publish a
 number of prefixes.
 
 Has a little cli where you can control route publication, type "h" or "?" to get help in the cli.
 
-Currently only supports talking to a single peer (in reality). However, it can connect multiple peers, and
-keep the connection alive, but it will only publish routes to the last connected peer.
+Supports multiple peers, and each peer can be shown a different AS - if the machine where bgpfake.js is running has multiple ip addresses
 
 effectively ignores any routes published to it, keeps track of how many routes its published, but doesnt
 keep track of the details. Uses a table of randomally generated AS paths for AS path publication
