@@ -9,8 +9,8 @@ Has a little cli where you can control route publication, type "h" or "?" to get
 
 Supports multiple peers, and each peer can be shown a different AS - if the machine where bgpfake.js is running has multiple ip addresses
 
-effectively ignores any routes published to it, keeps track of how many routes its published, but doesnt
-keep track of the details. Uses a table of randomally generated AS paths for AS path publication
+effectively ignores any routes published to it, keeps track of how many routes its published, but doesn't
+keep track of the details. Uses a table of randomly generated AS paths for AS path publication
 
 Any suggestions on improvement are welcome.
 
@@ -163,6 +163,7 @@ TODO
  - add route withdrawal
  - add ability to fake connection problems and/or send notifies back to peers
  - add ability to choose start range
+ - save settings into somewhere appropriate (perhaps, but probably not), i.e. ~/.bgpfakerc
 
  
  
