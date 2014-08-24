@@ -323,7 +323,7 @@ function printCLIUsage() {
 	console.log("\th[elp],? - this help menu");	
 	console.log("\ta - toggle use of private ranges (false)");
 	console.log("\tk x - automatically pause after x route publications, 0 to disable");
-	console.log("\tl - toggle per-peer updates (true). Each connected peer gets same next-hop and AS Path when this is false");
+	console.log("\tl - toggle per-peer updates (true). Each connected peer gets same next-hop and AS Path when this is false - if random addressing, each peer gets different destinations also");
 	console.log("\tm - toggle between random next hop and my ip as next hop, randomise last octet (false)");
 	console.log("\tn a b c - change timers, a is time between publications in ms (20), b is number of updates per publication (40), c is number of routes per update (100)");
 	console.log("\tp - pause sending route updates to connected peers");
@@ -466,18 +466,27 @@ function sendUpdate()
 		// TODO: this code is a little ugly, it could really be re-factored
 		for(var i=0; i<updatesPerInterval; i++) {
 			var iplist = new Array();
-			for(var l=0; l<routesPerUpdate; l++) {
-				iplist.push(getNextIP());
+			
+			if(sequentialIPs || !perPeerUpdates) {
+				for(var l=0; l<routesPerUpdate; l++) {
+					iplist.push(getNextIP());
+				}
 			}
 			
 			var asPath = getASPath();
 			for(var t=0; t<conns.length; t++) {
+				if(!sequentialIPs && perPeerUpdates) {
+					for(var l=0; l<routesPerUpdate; l++) {
+						iplist.push(getNextIP());
+					}					
+				}
 				var thisAS = getASForIP(conns[t].localAddress);
 				var nextHop = conns[t].localAddress;
 				if(randomNextHop) nextHop = getRandomNextHop();
 				if(perPeerUpdates) asPath = getASPath();
 				msg = constructUpdateMessage(routesPerUpdate, conns[t], thisAS, asPath, nextHop, iplist);
 				conns[t].write(msg);
+				
 			}
 		}
 		nSent += routesPerUpdate*updatesPerInterval;
