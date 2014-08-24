@@ -183,7 +183,7 @@ var updatesPerInterval = 40;
 
  */
 function printStatus() {
-	console.log("\t---- Status ----");
+	console.log("\n\t---- Status ----\n");
 	console.log("\tCurrently "+cState);
 	console.log("\tPrivate ranges: "+usePrivateRanges);
 	console.log("\tSequential publication: "+sequentialIPs);

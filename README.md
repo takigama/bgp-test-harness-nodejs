@@ -42,7 +42,9 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 	(4321) ready:2/0 (1.0.0) > LOG: update from remote (10.10.40.20)
 	(4321) ready:2/0 (1.0.0) > LOG: keepalive from remote (10.10.41.20)
 	(4321) ready:2/0 (1.0.0) > s
+	
 			---- Status ----
+			
 			Currently ready
 			Private ranges: false
 			Sequential publication: true
@@ -59,7 +61,9 @@ generally sudo would be the safer option otherwise any nodejs code run by anyone
 			        10.10.41.20 connected to 10.10.41.1 (local AS:4321)
 			        10.10.40.20 connected to 10.10.40.1 (local AS:5432)
 	(4321) ready:2/0 (1.0.0) > ?
+	
 			Help - (x) is default settings
+			
 	        h[elp],? - this help menu
 	        a - toggle use of private ranges (false)
 	        k x - automatically pause after x route publications, 0 to disable
