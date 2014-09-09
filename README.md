@@ -156,6 +156,7 @@ BUGS
 
 TODO
 ====
+ - add the ability to kill off connections
  - other family support (inet6, inet-vpn, etc)
  - add support for different subnet lengths (currently only does /24)
  - add random communities.
