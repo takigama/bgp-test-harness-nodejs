@@ -150,6 +150,9 @@ function startCLI() {
 		case "u":
 			startUpdates();
 			break;
+		case "x":
+			closeAllConnections(cmd);
+			break;
 		case "p":
 			stopUpdates();
 			break;
@@ -166,6 +169,40 @@ function startCLI() {
 	});
 }
 
+
+function closeAllConnections(cmd) {
+	var timers = cmd.split(" ");
+	var connclosed = false;
+	if(typeof timers[1] != "undefined") {
+		var tm = timers[1] - 1;
+		var lm = timers[1];
+		if(typeof conns[tm] != "undefined") {
+			console.log("Closing connection to, " + conns[tm].remoteAddress);
+			connclosed = true;
+			conns[tm].end();
+			
+		} else {
+			for(var t=0; t<conns.length; t++) {
+				if(conns[t].remoteAddress == lm) {
+					console.log("Closing connection to, " + conns[t].remoteAddress);
+					connclosed = true;
+					conns[t].end();
+				}
+			}			
+		}
+		
+		if(!connclosed) console.log("No such connection.");
+		
+	} else {	
+		if(conns.length != 0) {
+			for(var t=0; t<conns.length; t++) {
+				conns[t].end();
+			}
+		} else {
+			console.log("none to close...");
+		}
+	}
+}
 
 function toggelPerPerrUpdates() {
 	if(perPeerUpdates) {
@@ -212,7 +249,7 @@ function printStatus() {
 	if(conns.length != 0) {
 		console.log("\tConnections from: ");
 		for(var t=0; t<conns.length; t++) {
-			console.log("\t\t"+conns[t].remoteAddress+" connected to "+conns[t].localAddress + " (local AS:"+getASForIP(conns[t].localAddress)+")");
+			console.log("\t\t"+(t+1)+") "+conns[t].remoteAddress+" connected to "+conns[t].localAddress + " (local AS:"+getASForIP(conns[t].localAddress)+")");
 		}
 	} else {
 		console.log("No currently connected peers");
@@ -341,6 +378,7 @@ function printCLIUsage() {
 	console.log("\ts - status");
 	console.log("\tt - toggles between random and sequential addressing (sequential)");
 	console.log("\tu - start sending route updates to connected peers");
+	console.log("\tx [n] - clost all connections, or if \"n\" is included closes only that connection - \"n\" can either be the connection number from the status page or the IP address of the remote peer");
 	console.log("\tq[uit],exit,end - Quit");
 	console.log("Prompt layout");
 	console.log("\t(AS/IP) state:connections/updates-sent (current-route)\n");
