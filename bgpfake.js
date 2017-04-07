@@ -682,7 +682,7 @@ function getNextIP() {
 function getASPath() {
 	var n = Math.random();
 	
-	return asPaths[Math.round(asPaths.length*n)];
+	return asPaths[Math.round((asPaths.length-1)*n)];
 }
 
 function constructUpdateMessage(n_up, thisconn, thisAS, asPath, nextHop, ipList) {
